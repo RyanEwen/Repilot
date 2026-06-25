@@ -4,6 +4,12 @@ A Windows 11 app that lets you choose what your keyboard's dedicated **Copilot k
 does, using the official Microsoft "Copilot hardware key provider" path — so it
 appears in **Settings → Bluetooth & devices → Keyboard → Customize Copilot key**.
 
+**No background service. No wasted resources.** Nothing runs while you wait for the
+key — there's no always-on service, no tray icon, and no startup task sitting in
+memory or burning CPU/battery. When you press the key, a tiny handler runs your
+action in a fraction of a second and exits. The settings UI only runs while you have
+it open. Idle footprint: zero.
+
 ## Architecture (two processes, by design)
 
 The keypress path is deliberately **thin and non-resident** — nothing runs in the
