@@ -17,7 +17,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Image x:Name="AppIcon" Width="40" Height="40" VerticalAlignment="Center"/>
+                <FontIcon Glyph="&#xE946;" FontSize="24" VerticalAlignment="Center"/>
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="Copilot Key Remapper" FontSize="16" FontWeight="Medium"/>
                     <TextBlock x:Name="VersionText" FontSize="12" Opacity="0.6"/>
@@ -36,7 +36,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <FontIcon Glyph="&#xE946;" FontSize="24" VerticalAlignment="Center"/>
+                <FontIcon Glyph="&#xE897;" FontSize="24" VerticalAlignment="Center"/>
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="How it works" FontSize="14" FontWeight="Medium"/>
                     <TextBlock Text="Registers as an official Microsoft Copilot hardware-key provider. Pressing the key launches a tiny handler that runs your action and exits — no background service, no tray icon, nothing resident."

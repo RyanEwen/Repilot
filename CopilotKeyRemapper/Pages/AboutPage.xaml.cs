@@ -1,8 +1,6 @@
 using CopilotKeyRemapper.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Imaging;
-using System.IO;
 
 namespace CopilotKeyRemapper.Pages;
 
@@ -16,14 +14,6 @@ public sealed partial class AboutPage : Page
 
         var v = typeof(AboutPage).Assembly.GetName().Version!;
         VersionText.Text = $"Version {v.Major}.{v.Minor}.{v.Build}";
-
-        try
-        {
-            string ico = App.IconPath;
-            if (File.Exists(ico))
-                AppIcon.Source = new BitmapImage(new Uri(ico));
-        }
-        catch { /* ignore */ }
     }
 
     private async void CheckForUpdates_Click(object sender, RoutedEventArgs e)
