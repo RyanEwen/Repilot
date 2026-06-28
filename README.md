@@ -9,7 +9,9 @@
 </p>
 
 <p align="center">
-  <a href="https://apps.microsoft.com/search?query=Repilot"><img src="https://img.shields.io/badge/Microsoft_Store-Get_Repilot-0067b8?style=for-the-badge&logo=microsoftstore&logoColor=white" alt="Get Repilot from the Microsoft Store"></a>
+  <a href="https://apps.microsoft.com/detail/9pb5fj08pnvj">
+    <img src="https://get.microsoft.com/images/en-us%20dark.svg" alt="Download Repilot from the Microsoft Store" height="56">
+  </a>
 </p>
 
 Repilot lets you choose what your keyboard's dedicated **Copilot key** (or **Windows logo key + C**) does, using the official Microsoft "Copilot hardware key provider" path — so it appears in **Settings → Bluetooth & devices → Keyboard → Customize Copilot key**.
@@ -29,7 +31,7 @@ it open. Idle footprint: zero.
 
 ## Installing
 
-- **Microsoft Store (recommended):** [Get Repilot](https://apps.microsoft.com/search?query=Repilot) — installs and stays up to date automatically.
+- **Microsoft Store (recommended):** [Get Repilot](https://apps.microsoft.com/detail/9pb5fj08pnvj) — installs and stays up to date automatically.
 - Then go to **Settings → Bluetooth & devices → Keyboard → Customize Copilot key → Custom → Repilot**.
 - Open **Repilot** from the Start menu to set the action. You can also check for updates from the About page.
 
