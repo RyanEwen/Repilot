@@ -24,33 +24,20 @@ jobs:
         include:
         - language: actions
           build-mode: none
+        # Buildless analysis so CI never has to compile the app (a manual build
+        # would need the private external/promo submodule checked out).
         - language: csharp
-          build-mode: manual
+          build-mode: none
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        # Private cross-promo submodule (external/promo) needs a PAT with read
-        # access; add it as the SUBMODULES_TOKEN repository secret.
-        submodules: true
-        token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
-
-    - name: Setup .NET
-      if: matrix.build-mode == 'manual'
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '10.0.x'
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v4
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
-
-    - name: Manual build
-      if: matrix.build-mode == 'manual'
-      run: dotnet build Repilot.slnx -c Release
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
