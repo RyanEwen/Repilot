@@ -118,6 +118,7 @@ public sealed partial class SettingsWindow : Window
         "HomePage" => typeof(HomePage),
         "ActionPage" => typeof(ActionPage),
         "SettingsPage" => typeof(SettingsPage),
+        "PromotedAppsPage" => typeof(TechnicallyReal.Promo.PromotedAppsPage),
         "AboutPage" => typeof(AboutPage),
         _ => null
     };
