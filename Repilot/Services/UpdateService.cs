@@ -77,6 +77,52 @@ public static class UpdateService
         }
     }
 
+    /// <summary>
+    /// True when running from an MSIX package, so the Microsoft Store owns updating.
+    /// </summary>
+    /// <remarks>
+    /// <c>Package.Current</c> throws rather than returning null when the process is unpackaged,
+    /// which is the documented way to tell the two apart. Cached because the answer cannot
+    /// change while the process lives.
+    /// </remarks>
+    public static bool IsPackaged { get; } = DetectPackaged();
+
+    private static bool DetectPackaged()
+    {
+        try
+        {
+            return global::Windows.ApplicationModel.Package.Current is not null;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Close so Windows can finish installing a Store update, and come back afterwards.
+    /// </summary>
+    /// <remarks>
+    /// <para><b>An MSIX package cannot be installed while any of its processes are running.</b>
+    /// Repilot does not sit in the tray, so most of the time the Store updates it quite happily
+    /// while it is closed. The exception is the moment that matters: the settings window is by
+    /// definition open when someone clicks "Check for updates", so it blocks the very install
+    /// they are asking about.</para>
+    /// <para>Restarting applies anything staged without needing to detect it, which is just as
+    /// well: there is no reliable way to ask. <c>Package.CheckUpdateAvailabilityAsync</c> only
+    /// covers .appinstaller installs, not Store-distributed packages.</para>
+    /// <para><c>RegisterApplicationRestart</c> has to be called before shutdown begins, not
+    /// during it.</para>
+    /// </remarks>
+    public static void RestartToApplyUpdates()
+    {
+        RegisterApplicationRestart(null, 0);
+        Microsoft.UI.Xaml.Application.Current.Exit();
+    }
+
+    [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+    private static extern int RegisterApplicationRestart(string? pwzCommandline, int dwFlags);
+
     public static void OpenUrl(string url)
     {
         try { Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); }

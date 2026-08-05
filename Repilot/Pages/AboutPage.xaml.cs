@@ -18,6 +18,21 @@ public sealed partial class AboutPage : Page
 
     private async void CheckForUpdates_Click(object sender, RoutedEventArgs e)
     {
+        // A Store copy is updated by Windows, so a GitHub release link would be wrong advice.
+        // It is also the one moment Repilot blocks its own update: an MSIX package cannot
+        // install while any of its processes run, and this window is open by definition when
+        // someone asks about updates.
+        if (UpdateService.IsPackaged)
+        {
+            UpdateStatusText.Text =
+                "The Microsoft Store keeps this up to date, but an update cannot install while "
+                + "Repilot is open. Restart to apply anything already downloaded.";
+            CheckUpdateButton.Content = "Restart Now";
+            CheckUpdateButton.Click -= CheckForUpdates_Click;
+            CheckUpdateButton.Click += RestartForUpdate_Click;
+            return;
+        }
+
         CheckUpdateButton.IsEnabled = false;
         CheckUpdateButton.Content = "Checking...";
         UpdateStatusText.Text = "Checking for updates...";
@@ -44,6 +59,13 @@ public sealed partial class AboutPage : Page
 
         CheckUpdateButton.Content = "Check for Updates";
         CheckUpdateButton.IsEnabled = true;
+    }
+
+    private void RestartForUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        UpdateStatusText.Text = "Restarting...";
+        CheckUpdateButton.IsEnabled = false;
+        UpdateService.RestartToApplyUpdates();
     }
 
     private void ViewRelease_Click(object sender, RoutedEventArgs e)
