@@ -72,6 +72,8 @@ public static class WindowsFunctionCatalog
         // ── Notifications & input ────────────────────────────────────
         new() { Id = "notifications", Name = "Notification center", Group = "Notifications & input", Glyph = "",
             Description = "Open the notification center and calendar.", Combo = K(Win, C('N')) },
+        new() { Id = "context-menu", Name = "Menu key (context menu)", Group = "Notifications & input", Glyph = "",
+            Description = "Open the right-click menu for whatever has focus, like the old Menu key.", Combo = K(None, VK_APPS) },
         new() { Id = "quick-settings", Name = "Quick settings", Group = "Notifications & input", Glyph = "",
             Description = "Open the quick-settings flyout (Wi-Fi, volume, etc.).", Combo = K(Win, C('A')) },
         new() { Id = "clipboard-history", Name = "Clipboard history", Group = "Notifications & input", Glyph = "",

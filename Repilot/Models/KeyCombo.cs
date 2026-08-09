@@ -64,7 +64,7 @@ public static class KeyNames
     public const int VK_BACK = 0x08, VK_TAB = 0x09, VK_RETURN = 0x0D, VK_ESCAPE = 0x1B,
         VK_SPACE = 0x20, VK_PRIOR = 0x21, VK_NEXT = 0x22, VK_END = 0x23, VK_HOME = 0x24,
         VK_LEFT = 0x25, VK_UP = 0x26, VK_RIGHT = 0x27, VK_DOWN = 0x28, VK_SNAPSHOT = 0x2C,
-        VK_INSERT = 0x2D, VK_DELETE = 0x2E,
+        VK_INSERT = 0x2D, VK_DELETE = 0x2E, VK_APPS = 0x5D,
         VK_F23 = 0x86;
 
     private static readonly Dictionary<int, string> Map = new()
@@ -73,6 +73,7 @@ public static class KeyNames
         [VK_SPACE] = "Space", [VK_PRIOR] = "Page Up", [VK_NEXT] = "Page Down", [VK_END] = "End",
         [VK_HOME] = "Home", [VK_LEFT] = "Left", [VK_UP] = "Up", [VK_RIGHT] = "Right",
         [VK_DOWN] = "Down", [VK_SNAPSHOT] = "PrtScn", [VK_INSERT] = "Insert", [VK_DELETE] = "Delete",
+        [VK_APPS] = "Menu",
         [0x2E] = "Delete", [0xBA] = ";", [0xBB] = "+", [0xBC] = ",", [0xBD] = "-", [0xBE] = ".",
         [0xBF] = "/", [0xC0] = "`", [0xDB] = "[", [0xDC] = "\\", [0xDD] = "]", [0xDE] = "'",
     };

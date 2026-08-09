@@ -13,7 +13,7 @@ namespace Repilot.Services;
 /// </summary>
 public static class ActionExecutor
 {
-    private const ushort VK_LWIN = 0x5B, VK_RWIN = 0x5C, VK_SHIFT = 0x10,
+    private const ushort VK_LWIN = 0x5B, VK_RWIN = 0x5C, VK_APPS = 0x5D, VK_SHIFT = 0x10,
         VK_CONTROL = 0x11, VK_MENU = 0x12;
 
     /// <summary>Optional sink for errors from <see cref="Run"/> (the WinUI app wires NLog here).</summary>
@@ -132,7 +132,7 @@ public static class ActionExecutor
         0x21 or 0x22 or 0x23 or 0x24 => true, // PageUp/PageDown/End/Home
         0x25 or 0x26 or 0x27 or 0x28 => true, // arrows
         0x2C or 0x2D or 0x2E => true,         // PrintScreen/Insert/Delete
-        VK_LWIN or VK_RWIN => true,
+        VK_LWIN or VK_RWIN or VK_APPS => true,
         _ => false,
     };
 
