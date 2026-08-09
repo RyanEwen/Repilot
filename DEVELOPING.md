@@ -64,14 +64,35 @@ Before Store submission, set `<Identity>` `Name`/`Publisher` in
 - Windows SDK packaging tools to build the MSIX
 - Full Native AOT for the handler additionally needs the VC++ build tools (optional)
 
-## Publishing to the Microsoft Store (CI)
+## Publishing to the Microsoft Store
 
-The [`Publish to Microsoft Store`](.github/workflows/store-publish.yml) workflow builds
-the unsigned x64 + ARM64 packages, bundles them into `Repilot.msixupload`, and submits a
-new Store submission via the [Microsoft Store Developer CLI](https://learn.microsoft.com/windows/apps/publish/msstore-dev-cli/overview)
-whenever a `v*` tag is pushed (or via **Run workflow**).
+Repilot is a **paid** app, and the Microsoft Store Developer CLI cannot submit paid
+apps — so publishing is a manual upload today.
 
-**One-time setup** — add these repository secrets under
+**Releasing:**
+
+1. Bump `<Version>` in `Directory.Build.props` (the Store rejects a submission whose
+   package version is not higher than the live one) and commit.
+2. Build both unsigned Store packages:
+
+   ```powershell
+   .\RepilotMSIX\generate-msix-images.ps1
+   .\RepilotMSIX\build-msix.ps1 -Platform x64 -NoSign
+   .\RepilotMSIX\build-msix.ps1 -Platform ARM64 -NoSign
+   ```
+
+3. Zip `Repilot-x64.msix` + `Repilot-ARM64.msix` from `RepilotMSIX\bin\msix-output`
+   into a single archive and rename it `Repilot.msixupload`.
+4. Upload it to Partner Center (product `9PB5FJ08PNVJ`) and submit for certification.
+5. Tag the release: `git tag v1.0.17 && git push origin v1.0.17`.
+
+### Automated submission (disabled)
+
+The [`Publish to Microsoft Store`](.github/workflows/store-publish.yml) workflow does
+steps 2–4 via the [Microsoft Store Developer CLI](https://learn.microsoft.com/windows/apps/publish/msstore-dev-cli/overview).
+It is **manual-dispatch only** and cannot succeed while the CLI lacks paid-app support.
+Once Microsoft adds it, restore the `push: tags: 'v*'` trigger and add these repository
+secrets under
 *Settings → Secrets and variables → Actions*:
 
 | Secret | Where to get it |
@@ -85,14 +106,3 @@ To create the linked app: Partner Center → **Account settings → User managem
 Azure AD applications → Add Azure AD application**. Create (or link) an app and give it
 the **Manager** role, then add a **client secret** to it in Entra. The Store product ID
 (`9PB5FJ08PNVJ`) is public and is hardcoded in the workflow.
-
-**Releasing:** bump `<Version>` in `Directory.Build.props` (the Store rejects a
-submission whose package version is not higher than the live one), commit, then:
-
-```powershell
-git tag v1.0.15
-git push origin v1.0.15
-```
-
-The workflow builds, bundles, and commits a submission for certification. Track its
-progress in Partner Center; it goes live automatically once it passes.

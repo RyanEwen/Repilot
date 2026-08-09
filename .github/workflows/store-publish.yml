@@ -1,8 +1,13 @@
 name: Publish to Microsoft Store
 
 # Builds the unsigned Store packages (x64 + ARM64) and submits a new Microsoft
-# Store submission via the Microsoft Store Developer CLI (msstore). Runs on every
-# version tag (and on demand).
+# Store submission via the Microsoft Store Developer CLI (msstore).
+#
+# DISABLED -- manual dispatch only. The msstore CLI cannot submit paid apps, so
+# this cannot publish Repilot today; the version-tag trigger is removed so a
+# release tag does not fire a run that is guaranteed to fail. Release by building
+# locally (see DEVELOPING.md) and uploading Repilot.msixupload in Partner Center.
+# Restore the `push: tags: v*` trigger once Microsoft adds paid-app support.
 #
 # One-time setup -- add these repository secrets
 # (Settings -> Secrets and variables -> Actions -> New repository secret):
@@ -15,14 +20,11 @@ name: Publish to Microsoft Store
 # See DEVELOPING.md for how to obtain these. The Store product ID (9PB5FJ08PNVJ)
 # is public, so it is hardcoded below.
 #
-# IMPORTANT: bump <Version> in Directory.Build.props before tagging -- the Store
-# rejects a submission whose package version is not higher than the live one.
+# IMPORTANT: bump <Version> in Directory.Build.props before dispatching -- the
+# Store rejects a submission whose package version is not higher than the live one.
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
 
 jobs:
   store-publish:
