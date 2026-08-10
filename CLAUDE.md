@@ -74,6 +74,43 @@ WinUI-only: `Services/ActionSummary.cs`, `Services/CopilotKeyProvider.cs`
 - MSIX blocks reinstalling the same version with different content — bump
   `<Version>` in `Directory.Build.props` per build.
 
+## Update checking (`Services/UpdateService.cs`)
+
+Packaged copies check the **Store**; unpackaged ones check GitHub Releases. Same shape as the
+sibling apps (Little Launcher, Drive for Immich) — keep the three in step.
+
+- **Presence of the app's own package family in `GetAppAndOptionalStorePackageUpdatesAsync` is
+  the update signal.** `StorePackageUpdate.Package` describes the package *as installed*, so
+  `Id.Version` reports the version already on the machine, never the one being offered — measured
+  on Little Launcher with a live update pending (installed 1.27.1.0, published 1.28.0.0: one
+  entry, reporting 1.27.1.0). **Never require the listed version to be strictly newer**; it can
+  never match, and the result is a permanent, silent "up to date" while the Store shows the
+  update ready. That exact bug shipped in both sibling apps.
+- The version *number* comes from the Store's public display-catalog endpoint
+  (`TryGetPublishedVersionAsync`, product `9PB5FJ08PNVJ`). Best-effort: null means "cannot say"
+  and the Store's list is trusted alone; a published version that is not newer suppresses a stale
+  offer. `LatestVersion` is empty when an update exists but its number is unknown, and About
+  words that case without a version.
+- **Download and install are separate Store calls.** Only `RequestDownloadStorePackageUpdatesAsync`
+  reports real progress; installing needs every process in the package to exit, and the settings
+  window is open by definition when someone clicks "Check for updates".
+- Every check is logged, because this failure mode is otherwise invisible — the check *succeeds*.
+
+Verify either half without a Store submission:
+
+```bash
+curl -s "https://displaycatalog.mp.microsoft.com/v7.0/products/9PB5FJ08PNVJ?market=US&languages=en-us&fieldsTemplate=Details"
+```
+
+```powershell
+Invoke-CommandInDesktopPackage -PackageFamilyName '27766TechnicallyReal.CopilotKeyRemapper_gfb69tsnc4jnp' -AppId 'App' -Command 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' -Args '-NoProfile -ExecutionPolicy Bypass -File <script>'
+```
+
+The readable version is inside each `PackageFullName` (`…_1.0.17.0_arm64__hash`), not the numeric
+`Version` beside it (a packed 64-bit value). `StoreContext`/`Package.Current` need package
+identity, which is what `Invoke-CommandInDesktopPackage` supplies; use Windows PowerShell 5.1,
+not `pwsh`, and write output outside the package's redirected AppData.
+
 ## Building
 
 - Dev UI: `dotnet build Repilot/Repilot.csproj -c Debug`.
