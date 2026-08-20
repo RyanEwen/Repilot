@@ -119,6 +119,28 @@ not `pwsh`, and write output outside the package's redirected AppData.
   exes; finds SDK tools in an installed SDK or the `Microsoft.Windows.SDK.BuildTools`
   NuGet package). `-NoSign` for Store. Set `<Identity>` from Partner Center first.
 
+## Releases and distribution (no public binaries, ever)
+
+- **The Microsoft Store is the install route** (product `9PB5FJ08PNVJ`). Repilot is a paid
+  app in a public repo, so there is nothing to give away here, and an unpackaged build is
+  not a usable product anyway: the key is claimed through the
+  `com.microsoft.windows.copilotkeyprovider` AppExtension, so without package identity it
+  cannot be assigned (`Pages/HomePage.xaml.cs` hides the Assign button and says exactly that).
+  Anyone who wants to run it from source builds it themselves.
+- **A GitHub release carries notes and the tag, nothing downloadable.**
+  `build-msix.yml` attaches no release assets and uploads no Actions artifact; artifacts on
+  a public repo need only read access, which for a public repo means anybody. Do not add
+  either back, and do not invent a portable build to fill the gap: there isn't one.
+- **It still builds the MSIX on both platforms every run, and that step stays.** It is CI's
+  only check that manifest stamping, `makepri`, `makeappx` and signing work. Delete it and
+  the first sign of a break is a failed Store submission.
+- The Store package comes from `store-publish.yml` (manual dispatch; it cannot succeed while
+  the msstore CLI lacks paid-app support) or locally from `build-msix.ps1 -NoSign`, which
+  keeps the real Partner Center identity and leaves the package unsigned because the Store
+  re-signs at ingestion. Keep that local path working.
+- Unpackaged copies check GitHub Releases and offer "View Release", a link to the release
+  page, never an asset download, so notes-only releases are fine for that path.
+
 ## Adding a Windows function
 
 Add an entry to `Services/WindowsFunctionCatalog.All` (unique `Id`, `Name`, `Group`,

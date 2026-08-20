@@ -55,6 +55,12 @@ Idle footprint: zero.
 
 Repilot is open source. See **[DEVELOPING.md](DEVELOPING.md)** for the architecture and build instructions.
 
+Releases here carry **release notes only**, with nothing attached to download. Repilot has to
+be an installed, signed MSIX before Windows will let the Copilot key be assigned to it, so an
+unpackaged build is not something you could use. The
+[Microsoft Store](https://apps.microsoft.com/detail/9pb5fj08pnvj) is the install route, and
+building it yourself is the alternative.
+
 ## License
 
 Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE.md): free for any

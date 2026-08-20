@@ -1,5 +1,23 @@
 name: Build and Package
 
+# This workflow publishes no binaries anywhere, on purpose.
+#
+# Repilot is a paid app living in a public repo, and it does not work without
+# package identity: the Copilot key is claimed through the
+# `com.microsoft.windows.copilotkeyprovider` AppExtension in
+# Package.appxmanifest, so an unpackaged build cannot be assigned to the key at
+# all (Repilot/Pages/HomePage.xaml.cs hides the Assign button and says so). An
+# unpackaged build is therefore not a usable product, and there is no honest
+# binary to hand the public. Actions artifacts on a public repo need only read
+# access to download, which for a public repo means anyone, so a signed MSIX
+# cannot be attached there either.
+#
+# The install route is the Microsoft Store:
+# https://apps.microsoft.com/detail/9pb5fj08pnvj
+# Anyone who wants to run it from source can build it themselves (DEVELOPING.md).
+# The Store package is produced by store-publish.yml, or locally with
+# `.\RepilotMSIX\build-msix.ps1 -NoSign`.
+
 on:
   workflow_dispatch:
   push:
@@ -47,6 +65,12 @@ jobs:
         run: ./RepilotMSIX/generate-msix-images.ps1
 
       # ── Build the MSIX package ─────────────────────────────────
+      # Nothing consumes this package, and that is not a reason to delete the
+      # step. It is CI's only check that manifest stamping, makepri, makeappx
+      # and signing still work on both platforms; without it, a break in any of
+      # them would first surface during a Store submission, which is the
+      # slowest and worst place to discover one.
+      #
       # Sign with a CA-trusted certificate when these repository secrets exist:
       #   CODESIGN_PFX_BASE64   — base64-encoded PFX certificate file
       #   CODESIGN_PFX_PASSWORD — password for the PFX certificate
@@ -70,14 +94,11 @@ jobs:
           }
           if ($LASTEXITCODE -ne 0) { Write-Error "build-msix failed"; exit 1 }
 
-      - name: Upload MSIX artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: MSIX-${{ matrix.platform }}
-          path: RepilotMSIX/bin/msix-output/Repilot-${{ matrix.platform }}.msix
-
   release:
     if: startsWith(github.ref, 'refs/tags/v')
+    # The release carries notes and a tag, nothing downloadable, so `build` is
+    # not feeding it anything. It stays a dependency so a tag whose packaging is
+    # broken never gets a release announcing it.
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -103,24 +124,16 @@ jobs:
             echo "## What's Changed"
             echo ""
             echo "$BODY"
+            echo ""
+            echo "## Installing"
+            echo ""
+            echo "Repilot installs from the [Microsoft Store](https://apps.microsoft.com/detail/9pb5fj08pnvj), which also keeps it up to date. Releases here are notes only and carry no download: the app needs MSIX package identity to be assignable to the Copilot key, so an unpackaged build would not work. To run it from source, see [DEVELOPING.md](https://github.com/${GITHUB_REPOSITORY}/blob/main/DEVELOPING.md)."
             echo "RELEASE_EOF"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Download MSIX artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: MSIX-*
-          path: artifacts
-
-      - name: Collect release files
-        run: |
-          mkdir -p release
-          find artifacts -name '*.msix' -exec cp {} release/ \;
-          ls -la release
-
+      # No `files:` here on purpose: see the note at the top of this file.
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release/*
           body: ${{ steps.notes.outputs.RELEASE_BODY }}
           generate_release_notes: true

@@ -86,6 +86,25 @@ apps — so publishing is a manual upload today.
 4. Upload it to Partner Center (product `9PB5FJ08PNVJ`) and submit for certification.
 5. Tag the release: `git tag v1.0.17 && git push origin v1.0.17`.
 
+### What a GitHub release contains
+
+The tag runs [`Build and Package`](.github/workflows/build-msix.yml), which publishes a
+release carrying **notes and the tag only**. Nothing is attached to it, and no Actions
+artifact is uploaded either.
+
+That is deliberate. Repilot is a paid app in a public repo, and Actions artifacts on a
+public repo can be downloaded by anyone with read access, which is everyone. An unpackaged
+build would not be a usable product to hand out in any case: the Copilot key is claimed
+through the `com.microsoft.windows.copilotkeyprovider` AppExtension in
+`Package.appxmanifest`, so without package identity the key cannot be assigned at all (the
+Home page hides the Assign button and says so). The Store is the install route; anyone who
+wants to run it from source can build it with the commands above. There is no portable build.
+
+The workflow still **builds the MSIX for x64 and ARM64 on every run**, even though nothing
+consumes the result. It is the only automated check that manifest stamping, `makepri`,
+`makeappx` and signing still work, and a break in those would otherwise surface for the
+first time during a Store submission.
+
 ### Automated submission (disabled)
 
 The [`Publish to Microsoft Store`](.github/workflows/store-publish.yml) workflow does
