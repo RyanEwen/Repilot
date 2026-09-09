@@ -1,4 +1,4 @@
-# Repilot — Claude Code Instructions
+# Repilot — Codex Instructions
 
 ## Project overview
 

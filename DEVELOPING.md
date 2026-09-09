@@ -4,6 +4,14 @@ Repilot remaps the Windows 11 Copilot key via the official Microsoft "Copilot
 hardware key provider" model. It ships as a signed **MSIX** (required for it to be
 assignable in Settings).
 
+## Working with Codex
+
+Open this repository in Codex. Project instructions live in [AGENTS.md](AGENTS.md),
+which Codex loads automatically. Keep architecture constraints, build guidance, and
+project-specific gotchas there so future tasks use the same guidance. See the
+[official instruction-file documentation](https://developers.openai.com/codex/guides/agents-md)
+for how Codex discovers and combines instructions.
+
 ## Architecture (two processes, by design)
 
 The keypress path is deliberately **thin and non-resident** — nothing runs in the
