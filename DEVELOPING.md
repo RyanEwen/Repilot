@@ -89,7 +89,7 @@ apps — so publishing is a manual upload today.
    .\RepilotMSIX\build-msix.ps1 -Platform ARM64 -NoSign
    ```
 
-3. Zip `Repilot-x64.msix` + `Repilot-ARM64.msix` from `RepilotMSIX\bin\msix-output`
+3. Zip `Repilot-<version>-x64.msix` + `Repilot-<version>-ARM64.msix` from `RepilotMSIX\bin\msix-output`
    into a single archive and rename it `Repilot.msixupload`.
 4. Upload it to Partner Center (product `9PB5FJ08PNVJ`) and submit for certification.
 5. Tag the release: `git tag v1.0.17 && git push origin v1.0.17`.
