@@ -74,25 +74,39 @@ Before Store submission, set `<Identity>` `Name`/`Publisher` in
 
 ## Publishing to the Microsoft Store
 
-Repilot is a **paid** app, and the Microsoft Store Developer CLI cannot submit paid
-apps — so publishing is a manual upload today.
+The `store-publish.yml` workflow submits to product `9PB5FJ08PNVJ`.
 
-**Releasing:**
+The workflow pins [Microsoft Store CLI v0.4.3](https://github.com/microsoft/msstore-cli/releases/tag/v0.4.3),
+builds unsigned x64 and ARM64 packages on one runner, bundles them into a `.msixupload`,
+and submits directly to Partner Center on `v*` tags. It uploads no public binary artifacts.
+Manual dispatch defaults `no_commit` to true for draft review; disable it to commit the submission.
+Certification and the submission's publishing settings determine when it becomes available.
 
-1. Bump `<Version>` in `Directory.Build.props` (the Store rejects a submission whose
-   package version is not higher than the live one) and commit.
-2. Build both unsigned Store packages:
+The published base price is US $0.99. The API may report it as `PriceId: "Base"`, which
+the CLI cannot round-trip. This workflow explicitly supplies `Tier1012`, the US $0.99
+tier identified by a [Microsoft maintainer](https://github.com/microsoft/msstore-cli/pull/175#issuecomment-5791491206).
+Tier pricing can change converted prices in other markets; review the ingested submission
+in Partner Center. The workflow checks for a pending submission before invoking the CLI,
+because the CLI would otherwise delete an existing draft.
 
-   ```powershell
-   .\RepilotMSIX\generate-msix-images.ps1
-   .\RepilotMSIX\build-msix.ps1 -Platform x64 -NoSign
-   .\RepilotMSIX\build-msix.ps1 -Platform ARM64 -NoSign
-   ```
+The repository secrets are `AZURE_AD_TENANT_ID`, `AZURE_AD_APPLICATION_CLIENT_ID`,
+`AZURE_AD_APPLICATION_SECRET`, and `SELLER_ID`. All four were present when checked on
+September 22, 2026; expiry and the Entra application's Partner Center Manager role still
+need a live submission check. Inspect the first tier-based submission's packages and pricing.
 
-3. Zip `Repilot-<version>-x64.msix` + `Repilot-<version>-ARM64.msix` from `RepilotMSIX\bin\msix-output`
-   into a single archive and rename it `Repilot.msixupload`.
-4. Upload it to Partner Center (product `9PB5FJ08PNVJ`) and submit for certification.
-5. Tag the release: `git tag v1.0.17 && git push origin v1.0.17`.
+**Releasing:** bump `<Version>` in `Directory.Build.props`, commit, create the matching
+`vX.Y.Z` tag and push. Verify both the notes-only release and Store submission workflows.
+
+For manual fallback, generate images and build both packages:
+
+```powershell
+.\RepilotMSIX\generate-msix-images.ps1
+.\RepilotMSIX\build-msix.ps1 -Platform x64 -NoSign
+.\RepilotMSIX\build-msix.ps1 -Platform ARM64 -NoSign
+```
+
+Upload the individual versioned `.msix` files from `RepilotMSIX/bin/msix-output` in
+Partner Center. The `.msixupload` container is used by CI's CLI submission.
 
 ### What a GitHub release contains
 
@@ -113,23 +127,12 @@ consumes the result. It is the only automated check that manifest stamping, `mak
 `makeappx` and signing still work, and a break in those would otherwise surface for the
 first time during a Store submission.
 
-### Automated submission (disabled)
+### Publishing credentials
 
-The [`Publish to Microsoft Store`](.github/workflows/store-publish.yml) workflow does
-steps 2–4 via the [Microsoft Store Developer CLI](https://learn.microsoft.com/windows/apps/publish/msstore-dev-cli/overview).
-It is **manual-dispatch only** and cannot succeed while the CLI lacks paid-app support.
-Once Microsoft adds it, restore the `push: tags: 'v*'` trigger and add these repository
-secrets under
-*Settings → Secrets and variables → Actions*:
+Use the four repository secrets listed above. The Entra tenant and application IDs identify
+the app linked in Partner Center; the secret is its client-secret value, and `SELLER_ID`
+comes from Partner Center account settings.
 
-| Secret | Where to get it |
-|---|---|
-| `STORE_TENANT_ID` | Entra (Azure AD) tenant ID of the app linked to Partner Center |
-| `STORE_CLIENT_ID` | Client (application) ID of that Entra app |
-| `STORE_CLIENT_SECRET` | A client secret you create for that Entra app |
-| `STORE_SELLER_ID` | Partner Center → *Account settings* → Seller ID |
-
-To create the linked app: Partner Center → **Account settings → User management →
-Azure AD applications → Add Azure AD application**. Create (or link) an app and give it
-the **Manager** role, then add a **client secret** to it in Entra. The Store product ID
-(`9PB5FJ08PNVJ`) is public and is hardcoded in the workflow.
+To create the linked app: Partner Center > Account settings > User management >
+Azure AD applications > Add Azure AD application. Give it the Manager role, then create
+its client secret in Entra. Renew the secret before expiry.

@@ -134,8 +134,9 @@ not `pwsh`, and write output outside the package's redirected AppData.
 - **It still builds the MSIX on both platforms every run, and that step stays.** It is CI's
   only check that manifest stamping, `makepri`, `makeappx` and signing work. Delete it and
   the first sign of a break is a failed Store submission.
-- The Store package comes from `store-publish.yml` (manual dispatch; it cannot succeed while
-  the msstore CLI lacks paid-app support) or locally from `build-msix.ps1 -NoSign`, which
+- The Store package comes from `store-publish.yml` on release tags (using `Tier1012` for
+  the US $0.99 base price; manual runs default to draft review) or locally from
+  `build-msix.ps1 -NoSign`, which
   keeps the real Partner Center identity and leaves the package unsigned because the Store
   re-signs at ingestion. Keep that local path working.
 - Unpackaged copies check GitHub Releases and offer "View Release", a link to the release
